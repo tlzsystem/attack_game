@@ -20,6 +20,11 @@ dimensiones = (700, 500)
 #--------------------------------------------------
 
 def main():
+	rect_x = 20
+	rect_y = 20
+	rect_cambio_x = 5
+	rect_cambio_y = 5
+
 	pantalla = pygame.display.set_mode(dimensiones)
 	pygame.display.set_caption("Gaza Atack")
 	hecho = False
@@ -34,15 +39,15 @@ def main():
 		#Dibujo
 		pantalla.fill(BLANCO)
 
-		pygame.draw.line(pantalla,VERDE,[0,0],[100,100],5)
-		pygame.draw.line(pantalla,ROJO,[500,500],[100,300],5)
+		pygame.draw.rect(pantalla,ROJO,[rect_x,rect_y,100,50],2)
+		rect_x+= rect_cambio_x
+		rect_y+= rect_cambio_y
 
-		for desplazar_y in range(0,100,10):
-			pygame.draw.line(pantalla,ROJO,[0,10+desplazar_y],[100,110+desplazar_y],5)
-		for desplazar_x in range(0,700,10):
-			pygame.draw.line(pantalla,NEGRO,[30+desplazar_x,0],[30+desplazar_x,250],5)
-		
-		pygame.draw.rect(pantalla,ROJO,[400,36,100,50],2)
+		if rect_y >450 or rect_y <0:
+			rect_cambio_y = rect_cambio_y * -1
+		if rect_x > 650 or rect_x <0:
+			rect_cambio_x = rect_cambio_x * -1
+
 		pygame.display.flip()
 	return 0;
 
