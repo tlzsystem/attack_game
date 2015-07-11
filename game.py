@@ -19,9 +19,9 @@ class Bomba(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.Surface([5,5])
 		self.image.fill(NEGRO)
+		self.image.set_colorkey(BLANCO)
 		pygame.draw.ellipse(self.image, NEGRO, [5,550,5,5])
 		self.rect = self.image.get_rect()
-		self.image.set_colorkey(BLANCO)
 	def mover(self,tiempo):
 		self.rect.x = 5+self.vinicial*math.cos(math.radians(self.angulo))*tiempo
 		self.rect.y = 550+(self.vinicial*math.sin(math.radians(self.angulo))*tiempo-((0.0098*tiempo*tiempo)/2))*-1
@@ -50,39 +50,45 @@ def main():
 	y=520
 
 	pantalla = pygame.display.set_mode(dimensiones)
-	imagen_fondo = pygame.image.load("fondo.png")
+	#imagen_fondo = pygame.image.load("fondo.png")
 	pygame.display.set_caption("Gaza Atack")
 	hecho = False
 	#soldado = GIFImage("soldado.gif")
 	reloj = pygame.time.Clock()
 	bomba_lista = pygame.sprite.Group()
-	bomba_lanzada = Bomba()
-	bomba_lanzada.rect.x =6;
-	bomba_lanzada.rect.y =500;
-	bomba_lanzada.angulo = random.randint(5,80)
-	bomba_lista.add(bomba_lanzada)
-	
+
+	for i in range (50):
+		bomba_lanzada = Bomba()
+		bomba_lanzada.rect.x =6;
+		bomba_lanzada.rect.y =500;
+		bomba_lanzada.angulo = random.randint(5,60)
+		bomba_lista.add(bomba_lanzada)
+
 
 	#Eventos de procesamiento
 	while not hecho:
-		reloj.tick(60)
+		
 		for evento in pygame.event.get(): #acciones del usuario
 			if evento.type == pygame.QUIT:
 				hecho = True	
 		#Logica del jueo
+		bomba_lista.mover(x/2)
 
 
 
 		#Dibujo
 		pantalla.fill(BLANCO)
-		pantalla.blit(imagen_fondo,[0,0])
+		#pantalla.blit(imagen_fondo,[0,0])
 		bomba_lista.draw(pantalla)
 		#soldado.render(pantalla,(x,y))
 		pygame.draw.ellipse(pantalla,NEGRO,[5+ejex(5,30,x/2),550+(ejey(5,30,x/2)*-1),8,8])
 		#bomba_lista.mover(self,x)
-		bomba_lanzada.mover(x/2)
+		#bomba_lanzada.mover(x/2)
 		x = x + 1
 
+		bomba_lista.draw(pantalla)
+
+		reloj.tick(60)
 		pygame.display.flip()
 
 	return 0;
