@@ -18,12 +18,14 @@ pantalla = pygame.display.set_mode(dimensiones)
 class Bomba(pygame.sprite.Sprite):
 	vinicial = 5
 	angulo = 0
+	caer = False
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.Surface([5,5])
-		self.image.fill(NEGRO)
+		#self.image = pygame.Surface([5,5])
+		#self.image.fill(NEGRO)
+		self.image = pygame.image.load("misil_ataca.png").convert()
 		self.image.set_colorkey(BLANCO)
-		#pygame.draw.ellipse(self.image, NEGRO, [6,500,5,5])
+		
 		self.rect = self.image.get_rect()
 	def mover(self,tiempo):
 		self.rect.x = 6+self.vinicial*math.cos(math.radians(self.angulo))*tiempo
@@ -33,6 +35,8 @@ class Bomba(pygame.sprite.Sprite):
 			return True
 		else:
 			return False
+	def explotarYSacarDePantalla(self):
+		self.rect.x=1800;
 
 class Proyectil(pygame.sprite.Sprite):
 	tiempo = 1
@@ -50,8 +54,6 @@ class Proyectil(pygame.sprite.Sprite):
 		self.angulo = xangulo
 	def update(self):
 		pos = 550+((math.tan(math.radians(self.angulo))*self.tiempo)*-1)
-		print(self.tiempo)
-		print(pos)
 		self.rect.x = 1180-self.tiempo
 		self.rect.y = pos	
 		self.tiempo = self.tiempo +8
@@ -115,6 +117,7 @@ def main():
 		bomba_lanzada.rect.y =500;
 		bomba_lanzada.angulo = random.randint(15,40)
 		bomba_lista.add(bomba_lanzada)
+
 	escudo = escudoDeHierro()
 
 
@@ -126,7 +129,8 @@ def main():
 				hecho = True
 			if evento.type == pygame.KEYDOWN:
 				if evento.key == pygame.K_UP:
-					angulo_escudo = angulo_escudo + 3
+					if angulo_escudo <85:
+						angulo_escudo = angulo_escudo + 3
 				if evento.key == pygame.K_DOWN:
 					angulo_escudo = angulo_escudo - 3
 				if evento.key == pygame.K_SPACE:
@@ -135,21 +139,32 @@ def main():
 					proyectil_lanzado.rect.y=550
 					proyectil_lanzado.disparar(angulo_escudo)
 					proyectiles_lista.add(proyectil_lanzado)
+					
 
 					
 
-		
+		proyectiles_lista.update()
 		#Logica del jueo
 		#bomba_lista.mover(x/2)
 		if contador<=47:
 			bomba_lanzada = bomba_lista.sprites()[contador]
+			
 			if bomba_lanzada.verificaLimitePantalla()==True:
 				contador = contador +1
 				x=0
 				bomba_lanzada = bomba_lista.sprites()[contador]
-			bomba_lanzada.mover(x/2)
+			bomba_lanzada.mover(x*2)
 		x = x + 1
-		proyectiles_lista.update()
+		
+
+		for proyectil_enaire in proyectiles_lista:
+			lista_impactos = pygame.sprite.spritecollide(proyectil_enaire,bomba_lista,False)
+			for bala in lista_impactos:
+				proyectiles_lista.remove(proyectil_enaire)
+				bala.explotarYSacarDePantalla()
+				print("choque")
+						
+
 
 		#Dibujo
 		pantalla.fill(BLANCO)
