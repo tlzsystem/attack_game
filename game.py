@@ -13,6 +13,7 @@ pantalla = pygame.display.set_mode(dimensiones)
 
 
 
+
 #CLASES
 #--------------------------------------------------
 class Bomba(pygame.sprite.Sprite):
@@ -69,11 +70,11 @@ class escudoDeHierro():
 		coordenaday=0.0
 		ladoa=0
 		ladob=0
-		ladoa=(math.sin(math.radians(angulo))*40)
-		ladob=(math.sqrt((40*40)-(ladoa*ladoa)))
+		ladoa=(math.sin(math.radians(angulo))*50)
+		ladob=(math.sqrt((50*50)-(ladoa*ladoa)))
 		coordenadax = 1180 - ladob
 		coordenaday = 550 - ladoa
-		pygame.draw.line(pantalla,NEGRO,[coordenadax,coordenaday],[1180,550],5)
+		pygame.draw.line(pantalla,NEGRO,[coordenadax,coordenaday],[1180,550],15)
 
 
 
@@ -101,15 +102,20 @@ def main():
 	y=520
 	contador=0
 	angulo_escudo=45
-
+	disparo_sonido = pygame.mixer.Sound("art/disparo.wav")
+	explota_sonido = pygame.mixer.Sound("art/explota.wav")
 	imagen_fondo = pygame.image.load("fondo.png")
 	pygame.display.set_caption("Atack")
 	hecho = False
 	#soldado = GIFImage("soldado.gif")
 	reloj = pygame.time.Clock()
 
+	cantidad_disparos=0
+	cantidad_aciertos=0
+	cantidad_perdidos=0
 	bomba_lista = pygame.sprite.Group()
 	proyectiles_lista = pygame.sprite.Group()
+	fuente = pygame.font.Font(None,25)
 
 	for i in range (50):
 		bomba_lanzada = Bomba()
@@ -139,6 +145,8 @@ def main():
 					proyectil_lanzado.rect.y=550
 					proyectil_lanzado.disparar(angulo_escudo)
 					proyectiles_lista.add(proyectil_lanzado)
+					disparo_sonido.play()
+					cantidad_disparos = cantidad_disparos + 1
 					
 
 					
@@ -146,13 +154,14 @@ def main():
 		proyectiles_lista.update()
 		#Logica del jueo
 		#bomba_lista.mover(x/2)
-		if contador<=47:
+		if contador<=49:
 			bomba_lanzada = bomba_lista.sprites()[contador]
 			
 			if bomba_lanzada.verificaLimitePantalla()==True:
 				contador = contador +1
 				x=0
-				bomba_lanzada = bomba_lista.sprites()[contador]
+				cantidad_perdidos = cantidad_perdidos + 1
+				#bomba_lanzada = bomba_lista.sprites()[contador]
 			bomba_lanzada.mover(x*2)
 		x = x + 1
 		
@@ -160,15 +169,18 @@ def main():
 		for proyectil_enaire in proyectiles_lista:
 			lista_impactos = pygame.sprite.spritecollide(proyectil_enaire,bomba_lista,False)
 			for bala in lista_impactos:
+				explota_sonido.play()
 				proyectiles_lista.remove(proyectil_enaire)
 				bala.explotarYSacarDePantalla()
-				print("choque")
+				cantidad_aciertos = cantidad_aciertos + 1
+				
 						
-
-
+		texto_salida = "Disparos: "+str(cantidad_disparos)+" Aciertos: "+str(cantidad_aciertos) +" Perdido: "+str(cantidad_perdidos)
+		texto=fuente.render(texto_salida,True,NEGRO)
 		#Dibujo
 		pantalla.fill(BLANCO)
 		pantalla.blit(imagen_fondo,[0,0])
+		pantalla.blit(texto,[10,50])
 		#bomba_lista.draw(pantalla)
 		#soldado.render(pantalla,(x,y))
 		#pygame.draw.ellipse(pantalla,NEGRO,[5+ejex(5,30,x/2),550+(ejey(5,30,x/2)*-1),8,8])
